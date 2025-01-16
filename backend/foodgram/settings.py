@@ -150,4 +150,4 @@ NAME_SLUG_MAX_CHAR = 200
 
 COLOR_MAX_CHAR = 7
 
-CSRF_TRUSTED_ORIGINS=['https://sickmoqchima.ddns.net']
+CSRF_TRUSTED_ORIGINS = ['https://sickmoqchima.ddns.net']
