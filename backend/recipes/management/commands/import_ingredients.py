@@ -1,6 +1,6 @@
+from csv import reader
 import os
 
-from csv import reader
 from django.core.management import BaseCommand
 
 from recipes.models import Ingredient
