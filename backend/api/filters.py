@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django_filters import FilterSet
 from django_filters.rest_framework import filters
+
 from recipes.models import Ingredient, Recipe, Tag
 
 
@@ -32,16 +33,16 @@ class RecipeFilter(FilterSet):
 
     def filter_is_favorited(self, queryset, name, value):
         """Фильтрует рецепты в избранном."""
-        user = self.request.user
-        if value and user.is_authenticated:
-            return queryset.filter(users_favorite__user=user)
+        if value:
+            return queryset.filter(users_favorite__user=self.request.user)
         return queryset
 
     def filter_is_in_shopping_cart(self, queryset, name, value):
         """Фильтрует рецепты в корзине."""
-        user = self.request.user
-        if value and user.is_authenticated:
-            return queryset.filter(users_shopping_cart__user=user)
+        if value:
+            return queryset.filter(
+                users_shopping_cart__user=self.request.user,
+            )
         return queryset
 
     def filter_by_tags(self, queryset, name, value):

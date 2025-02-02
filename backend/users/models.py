@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db import models
@@ -39,3 +40,38 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
+
+
+class Subscription(models.Model):
+    """Модель подписок пользователя."""
+
+    author = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+        related_name='subscribers',
+        verbose_name='Автор рецептов',
+    )
+    user = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+        related_name='subscriptions',
+        verbose_name='Пользователь',
+    )
+
+    class Meta:
+        ordering = ('author',)
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'
+        constraints = [
+            models.UniqueConstraint(
+                fields=('author', 'user'),
+                name='unique_sub_author',
+            ),
+            models.CheckConstraint(
+                check=~models.Q(user=models.F('author')),
+                name='no_self_following',
+            ),
+        ]
+
+    def __str__(self):
+        return f'{self.user} подписан на {self.author}'

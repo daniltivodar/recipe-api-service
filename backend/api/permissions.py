@@ -2,7 +2,7 @@ from rest_framework import permissions
 
 
 class IsAuthorOrAdmin(permissions.BasePermission):
-    """Права владельца и администратора."""
+    """Проверка на автора или админа."""
 
     def has_permission(self, request, view):
         return (

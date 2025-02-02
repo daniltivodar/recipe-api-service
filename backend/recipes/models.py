@@ -1,7 +1,8 @@
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from django.db import models
+
+from foodgram import settings
 
 User = get_user_model()
 
@@ -13,12 +14,6 @@ class Tag(models.Model):
         'Название',
         unique=True,
         max_length=settings.NAME_SLUG_MAX_CHAR,
-    )
-    color = models.CharField(
-        'Цвет в HEX',
-        unique=True,
-        null=True,
-        max_length=settings.COLOR_MAX_CHAR,
     )
     slug = models.SlugField(
         'Уникальный слаг',
@@ -36,7 +31,7 @@ class Tag(models.Model):
 
 
 class Ingredient(models.Model):
-    """Модель ингедиентов."""
+    """Модель ингредиентов."""
 
     name = models.CharField(
         'Название',
@@ -216,38 +211,3 @@ class ShoppingCart(models.Model):
 
     def __str__(self):
         return f'Рецепт {self.recipe} в корзине пользователя {self.user}'
-
-
-class Subscription(models.Model):
-    """Модель подписок пользователя."""
-
-    author = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='subscribers',
-        verbose_name='Автор рецептов',
-    )
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='subscriptions',
-        verbose_name='Пользователь',
-    )
-
-    class Meta:
-        ordering = ('author',)
-        verbose_name = 'Подписка'
-        verbose_name_plural = 'Подписки'
-        constraints = [
-            models.UniqueConstraint(
-                fields=('author', 'user'),
-                name='unique_sub_author',
-            ),
-            models.CheckConstraint(
-                check=~models.Q(user=models.F('author')),
-                name='no_self_following',
-            ),
-        ]
-
-    def __str__(self):
-        return f'{self.user} подписан на {self.author}'
