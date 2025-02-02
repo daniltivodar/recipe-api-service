@@ -8,7 +8,9 @@ from users.views import UserViewSet
 v1_router = DefaultRouter()
 
 v1_router.register(
-    'ingredients', views.IngredientViewSet, basename='ingredient',
+    'ingredients',
+    views.IngredientViewSet,
+    basename='ingredient',
 )
 v1_router.register('recipes', views.RecipeViewSet, basename='recipe')
 v1_router.register('tags', views.TagViewSet, basename='tag')

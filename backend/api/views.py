@@ -10,13 +10,20 @@ from api.filters import IngredientFilter, RecipeFilter
 from api.pagination import CustomPagination
 from api.permissions import IsAuthorOrAdmin
 from api.serializers import (
-    IngredientSerializer, TagSerializer,
-    RecipeGetSerializer, RecipePostSerializer,
+    IngredientSerializer,
+    TagSerializer,
+    RecipeGetSerializer,
+    RecipePostSerializer,
     RecipeShortSerializer,
 )
 from foodgram import settings
 from recipes.models import (
-    Favorite, Ingredient, Recipe, RecipeIngredient, ShoppingCart, Tag,
+    Favorite,
+    Ingredient,
+    Recipe,
+    RecipeIngredient,
+    ShoppingCart,
+    Tag,
 )
 
 
@@ -97,7 +104,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
             serializer = RecipeShortSerializer(recipe)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         get_object_or_404(
-            ShoppingCart, recipe=recipe, user=request.user,
+            ShoppingCart,
+            recipe=recipe,
+            user=request.user,
         ).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 

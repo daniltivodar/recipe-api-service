@@ -27,10 +27,15 @@ class Migration(migrations.Migration):
                         verbose_name="ID",
                     ),
                 ),
-                ("name", models.CharField(max_length=200, verbose_name="Название")),
+                (
+                    "name",
+                    models.CharField(max_length=200, verbose_name="Название"),
+                ),
                 (
                     "measurement_unit",
-                    models.CharField(max_length=200, verbose_name="Единица измерения"),
+                    models.CharField(
+                        max_length=200, verbose_name="Единица измерения"
+                    ),
                 ),
             ],
             options={
@@ -53,14 +58,21 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "image",
-                    models.ImageField(upload_to="media/", verbose_name="Фото рецепта"),
+                    models.ImageField(
+                        upload_to="media/", verbose_name="Фото рецепта"
+                    ),
                 ),
-                ("name", models.CharField(max_length=200, verbose_name="Название")),
+                (
+                    "name",
+                    models.CharField(max_length=200, verbose_name="Название"),
+                ),
                 ("text", models.TextField(verbose_name="Описание")),
                 (
                     "cooking_time",
                     models.PositiveSmallIntegerField(
-                        validators=[django.core.validators.MinValueValidator(1)],
+                        validators=[
+                            django.core.validators.MinValueValidator(1)
+                        ],
                         verbose_name="Время приготовления (в минутах)",
                     ),
                 ),
@@ -107,7 +119,9 @@ class Migration(migrations.Migration):
                 (
                     "slug",
                     models.SlugField(
-                        max_length=200, unique=True, verbose_name="Уникальный слаг"
+                        max_length=200,
+                        unique=True,
+                        verbose_name="Уникальный слаг",
                     ),
                 ),
             ],
@@ -205,7 +219,9 @@ class Migration(migrations.Migration):
                 (
                     "amount",
                     models.PositiveSmallIntegerField(
-                        validators=[django.core.validators.MinValueValidator(1)],
+                        validators=[
+                            django.core.validators.MinValueValidator(1)
+                        ],
                         verbose_name="Кол-во игредиента",
                     ),
                 ),
@@ -246,7 +262,9 @@ class Migration(migrations.Migration):
             model_name="recipe",
             name="tags",
             field=models.ManyToManyField(
-                through="recipes.RecipeTag", to="recipes.tag", verbose_name="Теги"
+                through="recipes.RecipeTag",
+                to="recipes.tag",
+                verbose_name="Теги",
             ),
         ),
         migrations.CreateModel(

@@ -6,11 +6,15 @@ from rest_framework import serializers
 
 from foodgram import settings
 from recipes.models import (
-    Favorite, Ingredient, Recipe, RecipeIngredient,
-    RecipeTag, ShoppingCart, Tag,
+    Favorite,
+    Ingredient,
+    Recipe,
+    RecipeIngredient,
+    RecipeTag,
+    ShoppingCart,
+    Tag,
 )
 from users.serializers import UserGetSerializer
-
 
 
 class Base64ImageField(serializers.ImageField):
@@ -23,7 +27,8 @@ class Base64ImageField(serializers.ImageField):
                 format, imgstr = data.split(';base64,')
                 ext = format.split('/')[-1]
                 data = ContentFile(
-                    base64.b64decode(imgstr), name=f'temp.{ext}',
+                    base64.b64decode(imgstr),
+                    name=f'temp.{ext}',
                 )
             except (ValueError, IndexError, base64.binascii.Error) as error:
                 raise serializers.ValidationError(
@@ -81,13 +86,14 @@ class RecipeGetSerializer(serializers.ModelSerializer):
             'measurement_unit',
             amount=F('recipeingredient__amount'),
         )
-    
+
     def get_is_favorited(self, obj):
         """Метод проверяет, добавлен ли рецепт в избранное."""
         if self.context.get('request').user.is_anonymous:
             return False
         return Favorite.objects.filter(
-            recipe=obj, user=self.context.get('request').user,
+            recipe=obj,
+            user=self.context.get('request').user,
         ).exists()
 
     def get_is_in_shopping_cart(self, obj):
@@ -95,7 +101,8 @@ class RecipeGetSerializer(serializers.ModelSerializer):
         if self.context.get('request').user.is_anonymous:
             return False
         return ShoppingCart.objects.filter(
-            recipe=obj, user=self.context.get('request').user,
+            recipe=obj,
+            user=self.context.get('request').user,
         ).exists()
 
 
@@ -122,7 +129,8 @@ class RecipePostSerializer(serializers.ModelSerializer):
     """Сериализатор для создания рецептов."""
 
     author = serializers.SlugRelatedField(
-        slug_field='username', read_only=True,
+        slug_field='username',
+        read_only=True,
     )
     image = Base64ImageField(required=True)
     tags = serializers.PrimaryKeyRelatedField(

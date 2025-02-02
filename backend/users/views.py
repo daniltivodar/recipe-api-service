@@ -42,7 +42,7 @@ class UserViewSet(UserViewSet):
             user = get_object_or_404(User, username=request.user.username)
             serializer = UserGetSerializer(
                 user,
-                partial = True,
+                partial=True,
                 data=request.data,
                 context={'request': request},
             )
@@ -74,12 +74,14 @@ class UserViewSet(UserViewSet):
     )
     def subscribe(self, request, id):
         """Метод подписки и отписки на авторов."""
-        author=get_object_or_404(User, id=id)
+        author = get_object_or_404(User, id=id)
         if request.method == 'POST':
             Subscription.objects.create(user=request.user, author=author)
             serializer = UserSubscriptionSerializer(author)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         get_object_or_404(
-            Subscription, user=request.user, author=author,
+            Subscription,
+            user=request.user,
+            author=author,
         ).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

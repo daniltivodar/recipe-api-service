@@ -19,6 +19,7 @@ class Command(BaseCommand):
             csv_reader = reader(csv_file)
             for row in csv_reader:
                 Ingredient.objects.update_or_create(
-                    name=row[0].strip(), measurement_unit=row[1].strip(),
+                    name=row[0].strip(),
+                    measurement_unit=row[1].strip(),
                 )
         self.stdout.write(self.style.SUCCESS('Список ингредиентов загружен!'))

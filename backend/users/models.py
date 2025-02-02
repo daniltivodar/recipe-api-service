@@ -8,7 +8,7 @@ from users.validators import ban_name_me
 
 
 class User(AbstractUser):
-    "Кастомная модель пользователя."
+    """Кастомная модель пользователя."""
 
     username_validator = UnicodeUsernameValidator
 
