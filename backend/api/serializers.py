@@ -2,7 +2,7 @@ import base64
 
 from django.core.files.base import ContentFile
 from django.db.models import F
-from rest_framework.serializers import serializers
+from rest_framework import serializers
 from foodgram import settings
 from recipes.models import (
     Favorite,
