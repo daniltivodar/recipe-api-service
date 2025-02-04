@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 from users.models import Subscription
 
@@ -7,7 +8,7 @@ admin.site.empty_value_display = 'Не задано'
 
 
 @admin.register(get_user_model())
-class UserAdmin(admin.ModelAdmin):
+class UserAdmin(BaseUserAdmin):
     """Интерфейс админ-зоны пользователей."""
 
     list_display = ('username', 'email')

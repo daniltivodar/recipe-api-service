@@ -2,13 +2,14 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.validators import UnicodeUsernameValidator
+from django.core.exceptions import ValidationError
 from django.db import models
 
 from users.validators import ban_name_me
 
 
 class User(AbstractUser):
-    """Кастомная модель пользователя."""
+    "Кастомная модель пользователя."
 
     username_validator = UnicodeUsernameValidator
 
@@ -67,11 +68,11 @@ class Subscription(models.Model):
                 fields=('author', 'user'),
                 name='unique_sub_author',
             ),
-            models.CheckConstraint(
-                check=~models.Q(user=models.F('author')),
-                name='no_self_following',
-            ),
         ]
+
+    def clean(self):
+        if self.author == self.user:
+            raise ValidationError('Вы не можете подписаться сами на себя!')
 
     def __str__(self):
         return f'{self.user} подписан на {self.author}'

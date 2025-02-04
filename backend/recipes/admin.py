@@ -4,6 +4,7 @@ from recipes.models import (
     Favorite,
     Ingredient,
     Recipe,
+    RecipeTag,
     RecipeIngredient,
     ShoppingCart,
     Tag,
@@ -12,10 +13,23 @@ from recipes.models import (
 admin.site.empty_value_display = 'Не задано'
 
 
+class RecipeTagInline(admin.TabularInline):
+    model = RecipeTag
+    min_num = 1
+    extra = 1
+
+
+class RecipeIngredientInline(admin.TabularInline):
+    model = RecipeIngredient
+    min_num = 1
+    extra = 1
+
+
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
     """Интерфейс админ-зоны тегов."""
 
+    inlines = (RecipeTagInline,)
     list_display = ('name', 'slug')
     list_filter = ('name',)
     search_fields = ('name',)
@@ -26,6 +40,7 @@ class TagAdmin(admin.ModelAdmin):
 class IngredientAdmin(admin.ModelAdmin):
     """Интерфейс админ-зоны ингредиентов."""
 
+    inlines = (RecipeIngredientInline,)
     list_display = (
         'name',
         'measurement_unit',
@@ -38,6 +53,7 @@ class IngredientAdmin(admin.ModelAdmin):
 class RecipeAdmin(admin.ModelAdmin):
     """Интерфейс админ-зоны рецептов."""
 
+    inlines = (RecipeTagInline, RecipeIngredientInline)
     list_display = ('name', 'author', 'amount_add_in_favorite')
     list_filter = ('tags',)
     search_fields = ('name', 'author')
@@ -63,13 +79,3 @@ class ShoppingCart(admin.ModelAdmin):
     list_display = ('user', 'recipe')
     search_fields = ('user',)
     list_display_links = ('user',)
-
-
-@admin.register(RecipeIngredient)
-class RecipeIngredientAdmin(admin.ModelAdmin):
-    """Интерфейс админ-зоны ингредиентов в рецептах."""
-
-    list_display = ('recipe', 'ingredient', 'amount')
-    list_filter = ('recipe', 'ingredient')
-    search_fields = ('recipe',)
-    list_display_links = ('recipe',)

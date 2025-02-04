@@ -81,6 +81,13 @@ class Recipe(models.Model):
         validators=[MinValueValidator(settings.MIN_COOKING_TIME)],
     )
     pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
+    short_url = models.CharField(
+        'Короткая ссылка',
+        max_length=settings.SHORT_URL_MAX,
+        unique=True,
+        blank=True,
+        null=True,
+    )
 
     class Meta:
         ordering = ('-pub_date',)

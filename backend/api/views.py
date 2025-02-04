@@ -1,10 +1,11 @@
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+import short_url
 
 from api.filters import IngredientFilter, RecipeFilter
 from api.pagination import CustomPagination
@@ -25,6 +26,12 @@ from recipes.models import (
     ShoppingCart,
     Tag,
 )
+
+
+def short_redirect_view(request, short_link):
+    """Редиректит на страницу рецепта по короткой ссылке."""
+    pk = short_url.decode_url(short_link)
+    return redirect(f'/recipes/{pk}/')
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
@@ -73,8 +80,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
     )
     def get_link(self, request, pk):
         """Возвращает ссылку рецепта."""
-        url = f'https://{settings.ALLOWED_HOSTS[0]}/recipes/{pk}'
-        return Response({'short-link': url}, status=status.HTTP_200_OK)
+        recipe = get_object_or_404(Recipe, pk=pk)
+        short_link = short_url.encode_url(recipe.id)
+        recipe.short_url = short_link
+        recipe.save()
+        url = f'https://{settings.ALLOWED_HOSTS[0]}/s/{short_link}/'
+        return Response({'short-link': url}, status=status.HTTP_201_CREATED)
 
     @action(
         detail=True,
