@@ -17,9 +17,13 @@ class Command(BaseCommand):
 
         with open(file_path, encoding='utf-8') as csv_file:
             csv_reader = reader(csv_file)
-            for row in csv_reader:
-                Tag.objects.update_or_create(
-                    name=row[0].strip(),
-                    slug=row[1].strip(),
-                )
+            Tag.objects.bulk_create(
+                [
+                    Tag(
+                        name=name.strip(),
+                        slug=slug.strip(),
+                    )
+                    for name, slug in csv_reader
+                ],
+            )
         self.stdout.write(self.style.SUCCESS('Список тегов загружен!'))

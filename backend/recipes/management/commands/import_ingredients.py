@@ -17,9 +17,13 @@ class Command(BaseCommand):
 
         with open(file_path, encoding='utf-8') as csv_file:
             csv_reader = reader(csv_file)
-            for row in csv_reader:
-                Ingredient.objects.update_or_create(
-                    name=row[0].strip(),
-                    measurement_unit=row[1].strip(),
-                )
+            Ingredient.objects.bulk_create(
+                [
+                    Ingredient(
+                        name=name.strip(),
+                        measurement_unit=measurement_unit.strip(),
+                    )
+                    for name, measurement_unit in csv_reader
+                ],
+            )
         self.stdout.write(self.style.SUCCESS('Список ингредиентов загружен!'))

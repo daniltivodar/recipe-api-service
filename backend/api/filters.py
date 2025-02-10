@@ -1,6 +1,6 @@
-from django.contrib.auth import get_user_model
 from django_filters import FilterSet
 from django_filters.rest_framework import filters
+
 from recipes.models import Ingredient, Recipe, Tag
 
 
@@ -26,9 +26,10 @@ class RecipeFilter(FilterSet):
         to_field_name='slug',
         queryset=Tag.objects.all(),
     )
-    author = filters.ModelChoiceFilter(
-        queryset=get_user_model().objects.all(),
-    )
+
+    class Meta:
+        model = Recipe
+        fields = ('author', 'tags', 'is_favorited', 'is_in_shopping_cart')
 
     def filter_is_favorited(self, queryset, name, value):
         """Фильтрует рецепты в избранном."""
@@ -40,17 +41,6 @@ class RecipeFilter(FilterSet):
         """Фильтрует рецепты в корзине."""
         if value:
             return queryset.filter(
-                users_shopping_cart__user=self.request.user,
+                users_shoppingcart__user=self.request.user,
             )
         return queryset
-
-    def filter_by_tags(self, queryset, name, value):
-        """Фильтрует рецепты по тегам."""
-        tag_slugs = self.request.query_params.getlist('tags')
-        if tag_slugs:
-            return queryset.filter(tags__slug__in=tag_slugs).distinct()
-        return queryset
-
-    class Meta:
-        model = Recipe
-        fields = ('author', 'tags', 'is_favorited', 'is_in_shopping_cart')

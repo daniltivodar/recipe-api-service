@@ -1,22 +1,18 @@
 from django.contrib import admin
+from django.contrib.auth.models import Group
+from django.utils.safestring import mark_safe
 
 from recipes.models import (
     Favorite,
     Ingredient,
     Recipe,
-    RecipeTag,
     RecipeIngredient,
+    RecipeShortUrl,
     ShoppingCart,
     Tag,
 )
 
 admin.site.empty_value_display = 'Не задано'
-
-
-class RecipeTagInline(admin.TabularInline):
-    model = RecipeTag
-    min_num = 1
-    extra = 1
 
 
 class RecipeIngredientInline(admin.TabularInline):
@@ -29,7 +25,6 @@ class RecipeIngredientInline(admin.TabularInline):
 class TagAdmin(admin.ModelAdmin):
     """Интерфейс админ-зоны тегов."""
 
-    inlines = (RecipeTagInline,)
     list_display = ('name', 'slug')
     list_filter = ('name',)
     search_fields = ('name',)
@@ -40,7 +35,6 @@ class TagAdmin(admin.ModelAdmin):
 class IngredientAdmin(admin.ModelAdmin):
     """Интерфейс админ-зоны ингредиентов."""
 
-    inlines = (RecipeIngredientInline,)
     list_display = (
         'name',
         'measurement_unit',
@@ -53,14 +47,38 @@ class IngredientAdmin(admin.ModelAdmin):
 class RecipeAdmin(admin.ModelAdmin):
     """Интерфейс админ-зоны рецептов."""
 
-    inlines = (RecipeTagInline, RecipeIngredientInline)
-    list_display = ('name', 'author', 'amount_add_in_favorite')
+    inlines = (RecipeIngredientInline,)
+    list_display = (
+        'name',
+        'author',
+        'amount_add_in_favorite',
+        'image',
+        'get_tags',
+        'get_ingredients',
+    )
     list_filter = ('tags',)
     search_fields = ('name', 'author')
 
     @admin.display(description='Кол-во добавлений в избранное')
     def amount_add_in_favorite(self, obj):
         return obj.users_favorite.count()
+
+    @admin.display(description='Изображение')
+    def image(self, obj):
+        """Метод возвращает картинку."""
+        return mark_safe(f'<img src={obj.image.url} width="80" height="60">')
+
+    @admin.display(description='Теги')
+    def get_tags(self, obj):
+        """Метод возвращает список тегов."""
+        return ', '.join([tag.name for tag in obj.tags.all()])
+
+    @admin.display(description='Ингредиенты')
+    def get_ingredients(self, obj):
+        """Метод возвращает список ингредиентов."""
+        return ', '.join(
+            [ingredient.name for ingredient in obj.ingredients.all()],
+        )
 
 
 @admin.register(Favorite)
@@ -79,3 +97,14 @@ class ShoppingCart(admin.ModelAdmin):
     list_display = ('user', 'recipe')
     search_fields = ('user',)
     list_display_links = ('user',)
+
+
+@admin.register(RecipeShortUrl)
+class RecipeShortUrlAdmin(admin.ModelAdmin):
+    """Интерфейс админ-зоны коротких ссылок."""
+
+    list_display = ('recipe', 'short_url')
+    list_display_links = ('recipe',)
+
+
+admin.site.unregister(Group)
