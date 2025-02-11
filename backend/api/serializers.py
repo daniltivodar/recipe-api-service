@@ -1,9 +1,9 @@
 from django.contrib.auth import get_user_model
 from django.db.models import F
 from djoser.serializers import UserSerializer
+from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 
-from api.fields import Base64ImageField
 from recipes.constants import MAX_INGREDIENTS_AMOUNT, MIN_INGREDIENTS_AMOUNT
 from recipes.models import (
     Favorite,
@@ -35,8 +35,8 @@ class UserGetSerializer(UserSerializer):
         """Метод определяет статус подписки на автора."""
         user = self.context.get('request').user
         return (
-            obj.author_subscribers.filter(user=user).exists()
-            and user.is_authenticated,
+            obj.author_subscriptions.filter(user=user.id).exists()
+            and user.is_authenticated
         )
 
 
@@ -60,7 +60,7 @@ class UserSubscriptionSerializer(UserGetSerializer):
     """Сериализатор для получения подписок пользователя."""
 
     recipes = serializers.SerializerMethodField()
-    recipes_count = serializers.IntegerField()
+    recipes_count = serializers.IntegerField(default=0)
 
     class Meta(UserGetSerializer.Meta):
         fields = UserGetSerializer.Meta.fields + (
@@ -70,16 +70,19 @@ class UserSubscriptionSerializer(UserGetSerializer):
 
     def get_recipes(self, obj):
         """Получение рецептов автора."""
-        request = self.context.get('request')
+        request = self.context['request']
         recipes = obj.recipes.all()
         recipes_limit = request.query_params.get('recipes_limit')
         if recipes_limit:
-            recipes = recipes[: int(recipes_limit)]
+            try:
+                recipes = recipes[: int(recipes_limit)]
+            except ValueError:
+                raise serializers.ValidationError('Лимит должен быть числом!')
         return SimpleRecipeSerializer(
             recipes,
             many=True,
             read_only=True,
-            context={'request': request},
+            context=self.context,
         ).data
 
 
@@ -128,8 +131,8 @@ class RecipeGetSerializer(serializers.ModelSerializer):
     author = UserGetSerializer()
     tags = TagSerializer(many=True)
     ingredients = serializers.SerializerMethodField()
-    is_favorited = serializers.BooleanField()
-    is_in_shopping_cart = serializers.BooleanField()
+    is_favorited = serializers.BooleanField(default=0)
+    is_in_shopping_cart = serializers.BooleanField(default=0)
     image = Base64ImageField()
 
     class Meta:
@@ -269,7 +272,10 @@ class RecipeFavoriteCartSerializer(serializers.ModelSerializer):
             user=self.context['request'].user,
             recipe=attrs['recipe'],
         ).exists():
-            raise serializers.ValidationError('Рецепт уже добавлен!')
+            raise serializers.ValidationError(
+                f'Рецепт уже добавлен в '
+                f'{self.Meta.model._meta.verbose_name.title()}!',
+            )
         return attrs
 
     def to_representation(self, instance):

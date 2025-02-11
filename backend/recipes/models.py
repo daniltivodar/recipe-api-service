@@ -7,7 +7,7 @@ from recipes import constants
 User = get_user_model()
 
 
-class FavoriteShoppingCart(models.Model):
+class AbstractUserRecipe(models.Model):
     """Абастрактная модель для классов избранного и корзины."""
 
     recipe = models.ForeignKey(
@@ -53,7 +53,7 @@ class Tag(models.Model):
         verbose_name_plural = 'Теги'
 
     def __str__(self):
-        return self.name
+        return self.name[: constants.MAX_CHAR]
 
 
 class Ingredient(models.Model):
@@ -80,7 +80,7 @@ class Ingredient(models.Model):
         )
 
     def __str__(self):
-        return self.name
+        return self.name[: constants.MAX_CHAR]
 
 
 class Recipe(models.Model):
@@ -109,10 +109,10 @@ class Recipe(models.Model):
     text = models.TextField('Описание')
     cooking_time = models.PositiveSmallIntegerField(
         'Время приготовления (в минутах)',
-        validators=[
+        validators=(
             MinValueValidator(constants.MIN_COOKING_TIME),
             MaxValueValidator(constants.MAX_COOKING_TIME),
-        ],
+        ),
     )
     pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
 
@@ -122,7 +122,7 @@ class Recipe(models.Model):
         verbose_name_plural = 'Рецепты'
 
     def __str__(self):
-        return self.name
+        return self.name[: constants.MAX_CHAR]
 
 
 class RecipeShortUrl(models.Model):
@@ -153,7 +153,7 @@ class RecipeShortUrl(models.Model):
         )
 
     def __str__(self):
-        return self.short_url
+        return self.short_url[: constants.MAX_CHAR]
 
 
 class RecipeIngredient(models.Model):
@@ -173,10 +173,10 @@ class RecipeIngredient(models.Model):
     )
     amount = models.PositiveSmallIntegerField(
         'Кол-во ингредиента',
-        validators=[
+        validators=(
             MinValueValidator(constants.MIN_INGREDIENTS_AMOUNT),
             MaxValueValidator(constants.MAX_INGREDIENTS_AMOUNT),
-        ],
+        ),
     )
 
     class Meta:
@@ -194,7 +194,7 @@ class RecipeIngredient(models.Model):
         return f'{self.ingredient} в кол-ве {self.amount}'
 
 
-class Favorite(FavoriteShoppingCart):
+class Favorite(AbstractUserRecipe):
     """Модель избранных рецептов."""
 
     class Meta:
@@ -209,7 +209,7 @@ class Favorite(FavoriteShoppingCart):
         )
 
 
-class ShoppingCart(FavoriteShoppingCart):
+class ShoppingCart(AbstractUserRecipe):
     """Модель корзины покупок."""
 
     class Meta:

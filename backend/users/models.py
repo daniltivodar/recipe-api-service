@@ -8,15 +8,17 @@ from users import constants
 
 
 class User(AbstractUser):
-    "Кастомная модель пользователя."
+    """Кастомная модель пользователя."""
 
     username_validator = UnicodeUsernameValidator
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ('username', 'first_name', 'last_name')
 
     username = models.CharField(
         'Уникальный юзернейм',
         unique=True,
         max_length=constants.USER_MAX_CHAR,
-        validators=[username_validator],
+        validators=(username_validator,),
     )
     email = models.EmailField(
         'Адрес электронной почты',
@@ -28,15 +30,12 @@ class User(AbstractUser):
         'Фамилия',
         max_length=constants.USER_MAX_CHAR,
     )
-    password = models.CharField('Пароль', max_length=constants.USER_MAX_CHAR)
     avatar = models.ImageField(
         'Аватар пользователя',
         blank=True,
         null=True,
         upload_to='avatars',
     )
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
 
     class Meta:
         ordering = ('username',)
@@ -44,7 +43,7 @@ class User(AbstractUser):
         verbose_name_plural = 'Пользователи'
 
     def __str__(self):
-        return self.username
+        return self.username[: constants.MAX_CHAR]
 
 
 class Subscription(models.Model):
@@ -53,7 +52,7 @@ class Subscription(models.Model):
     author = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
-        related_name='author_subscribers',
+        related_name='author_subscriptions',
         verbose_name='Автор рецептов',
     )
     user = models.ForeignKey(
