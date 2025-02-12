@@ -49,9 +49,9 @@ python manage.py import_ingredients
 ```
 
 ## Пример сайта можно посмотреть на:
-```bash
-https://sickmoqchima.ddns.net/
-```
+
+**https://sickmoqchima.ddns.net/**
+
 
 ## Создатели
 
