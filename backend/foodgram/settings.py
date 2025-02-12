@@ -142,4 +142,4 @@ REST_FRAMEWORK = {
     'PAGINATE_BY_PARAM': 'limit',
 }
 
-CORS_ALLOW_ALL_ORIGINS = True
+CSRF_TRUSTED_ORIGINS = ['https://sickmoqchima.ddns.net']
