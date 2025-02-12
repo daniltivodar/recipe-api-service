@@ -89,7 +89,7 @@ class UserViewSet(UserViewSet):
         """Метод возвращает подписки пользователя."""
         users = (
             User.objects.filter(
-                author_subscriptions__user=request.user,
+                subscriptions_to_author__user=request.user,
             )
             .annotate(recipes_count=Count('recipes'))
             .order_by('username')
@@ -163,18 +163,17 @@ class RecipeViewSet(viewsets.ModelViewSet):
             recipe=OuterRef('pk'),
             user=self.request.user.id,
         )
-        return (
-            Recipe.objects.select_related('author')
-            .all()
-            .prefetch_related(
-                'tags',
-                'ingredients',
+        queryset = Recipe.objects.select_related(
+            'author',
+        ).all().prefetch_related('tags', 'ingredients')
+        if self.request.user.is_authenticated:
+            return (
+                queryset.annotate(
+                    is_favorited=Exists(favorited_recipes),
+                    is_in_shopping_cart=Exists(cart_recipes),
+                )
             )
-            .annotate(
-                is_favorited=Exists(favorited_recipes),
-                is_in_shopping_cart=Exists(cart_recipes),
-            )
-        )
+        return queryset
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)

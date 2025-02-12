@@ -48,6 +48,11 @@ python manage.py import_tags
 python manage.py import_ingredients
 ```
 
+## Пример сайта можно посмотреть на:
+```bash
+https://sickmoqchima.ddns.net/
+```
+
 ## Создатели
 
 **[Данил Тиводар](https://github.com/daniltivodar)**

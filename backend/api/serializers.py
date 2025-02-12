@@ -35,7 +35,7 @@ class UserGetSerializer(UserSerializer):
         """Метод определяет статус подписки на автора."""
         user = self.context.get('request').user
         return (
-            obj.author_subscriptions.filter(user=user.id).exists()
+            obj.subscriptions_to_author.filter(user=user.id).exists()
             and user.is_authenticated
         )
 
