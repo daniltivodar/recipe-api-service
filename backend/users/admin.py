@@ -18,7 +18,7 @@ class UserAdmin(BaseUserAdmin):
     @admin.display(description='Кол-во подписчиков')
     def count_subscribers(self, obj):
         """Возвращает кол-во подписчиков."""
-        return obj.subscribers.count()
+        return obj.subscriptions_to_author.count()
 
     @admin.display(description='Кол-во рецептов')
     def count_recipes(self, obj):

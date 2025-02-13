@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db.models import Count, Exists, OuterRef, Sum
 from django.http import FileResponse
@@ -167,11 +168,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
             'author',
         ).all().prefetch_related('tags', 'ingredients')
         if self.request.user.is_authenticated:
-            return (
-                queryset.annotate(
-                    is_favorited=Exists(favorited_recipes),
-                    is_in_shopping_cart=Exists(cart_recipes),
-                )
+            queryset = queryset.annotate(
+                is_favorited=Exists(favorited_recipes),
+                is_in_shopping_cart=Exists(cart_recipes),
             )
         return queryset
 
@@ -191,10 +190,16 @@ class RecipeViewSet(viewsets.ModelViewSet):
         """Возвращает ссылку рецепта."""
         recipe = get_object_or_404(Recipe, pk=pk)
         short_link = short_url.encode_url(recipe.id)
-        RecipeShortUrl.objects.create(recipe=recipe, short_url=short_link)
+        RecipeShortUrl.objects.get_or_create(
+            recipe=recipe, short_url=short_link,
+        )
         recipe.save()
+        response = (
+            f'{settings.ALLOWED_HOSTS[0]}'
+            f'{reverse("short_url", args=(short_link,))}'
+        )
         return Response(
-            {'short-link': reverse('short_url', args=(short_link,))},
+            {'short-link': response},
             status=status.HTTP_201_CREATED,
         )
 
