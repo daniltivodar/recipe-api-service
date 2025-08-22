@@ -1,4 +1,4 @@
-![Build Status](https://github.com/daniltivodar/recipe-api-service/actions/workflows/main.yml/badge.svg)
+![Build Status](https://github.com/daniltivodar/recipe-api-service/actions/workflows/main.yml/badge.svg)(https://github.com/daniltivodar/recipe-api-service/actions)
 [![Python 3.9](https://img.shields.io/badge/Python-3.9-blue.svg)](https://www.python.org/)
 [![Django 4.2](https://img.shields.io/badge/Django-4.2-green.svg)](https://www.djangoproject.com/)
 [![DRF 3.15](https://img.shields.io/badge/DRF-3.15-red.svg)](https://www.django-rest-framework.org/)
@@ -64,12 +64,12 @@ docker-compose -f docker-compose.production.yml up --build
 
 ### Импорт тегов
 ```bash
-docker-compose exec web python manage.py import_tags
+docker-compose exec backend python manage.py import_tags
 ```
 
 ### Импорт ингредиентов
 ```bash
-docker-compose exec web python manage.py import_ingredients
+docker-compose exec backend python manage.py import_ingredients
 ```
 
 ## Документация API
